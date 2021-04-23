@@ -5,7 +5,6 @@ class Play extends Phaser.Scene {
 
     init(data){
         this.highScore = data;
-        console.log(this.highScore);
     }
 
     preload() {
@@ -74,6 +73,7 @@ class Play extends Phaser.Scene {
 
         //initialize time
         this.timeLeft = game.settings.gameTimer * 0.001;
+        this.startTime = this.time.now;
 
         // display score
         let scoreConfig = {
@@ -119,7 +119,7 @@ class Play extends Phaser.Scene {
         //when game is over run this once
         if(this.gameOver && !this.endScreen){
 
-            //hide score, FIRE, rocket, and spaceships
+            //hide score, time, FIRE, rocket, and spaceships
             this.scoreLeft.alpha = 0;
             this.p1Rocket.alpha = 0;
             this.ship01.alpha = 0;
@@ -150,9 +150,6 @@ class Play extends Phaser.Scene {
                 this.add.text(game.config.width/2, game.config.height/2, this.highScore.hard, this.scoreConfig).setOrigin(0.5);
             }
 
-            console.log(this.highScore.easy);
-            console.log(this.highScore.hard);
-
             this.endScreen = true;
         }
 
@@ -173,25 +170,6 @@ class Play extends Phaser.Scene {
             this.firingText.alpha = 1;
         }
 
-        //game will keep rockets and ship updated until game goes past 60 seconds
-        if(!this.gameOver){
-            //initializes update rocket code
-            this.p1Rocket.update();
-            //initializes update spaceship code
-            this.ship01.update();
-            this.ship02.update();
-            this.ship03.update();
-            //updates clock
-            var timeLeft = (game.settings.gameTimer * 0.001) - (this.time.now * 0.001);
-            this.timeText.setText(Math.round(timeLeft));
-        }
-
-        //will end game once timer reaches 0
-        if(timeLeft <= 0){ 
-            console.log("time over");
-            this.gameOver = true;
-        }
-
         //checks collisions
         if(this.checkCollision(this.p1Rocket, this.ship03)) {
             this.p1Rocket.reset();
@@ -207,6 +185,24 @@ class Play extends Phaser.Scene {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
             game.settings.gameTimer += 5000;
+        }
+
+        //game will keep rockets and ship updated until game goes past 60 seconds
+        if(!this.gameOver){
+            //initializes update rocket code
+            this.p1Rocket.update();
+            //initializes update spaceship code
+            this.ship01.update();
+            this.ship02.update();
+            this.ship03.update();
+            //updates clock
+            var timeLeft = (game.settings.gameTimer * 0.001) - ((this.time.now - this.startTime) * 0.001);
+            this.timeText.setText(Math.round(timeLeft));
+        }
+
+        //will end game once timer reaches 0
+        if(timeLeft <= 0){ 
+            this.gameOver = true;
         }
     }
 

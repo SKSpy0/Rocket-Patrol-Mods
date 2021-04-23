@@ -13,6 +13,10 @@ let borderPadding = borderUISize / 3;
 //keyboard controls
 let keyF, keyR, keyLEFT, keyRIGHT;
 
+
+//William Lee, Rocket Patrol Mods, 4/23/21
+//This project took about 13 hours to finish
+
 //List of Mods
 //(5) Created a new menu select and rocket fire SFX
 //(5) Player can move after Rocket is fired
@@ -23,5 +27,6 @@ let keyF, keyR, keyLEFT, keyRIGHT;
 //(5) Randomized direction for each spaceship on each play
 //(10) Implemented 4 explosion SFX that are randomized
 //(10) Implemented time remaining on screen
+//(10) New title screen
 //(20) New artwork for in-game assets (all created by me through Aseprite)
 //(20) Successful hits will add time to the clock, back ship gives 5 seconds, center ship gives 2 seconds, front ship gives 1 second
