@@ -3,6 +3,11 @@ class Play extends Phaser.Scene {
         super("playScene");
     }
 
+    init(data){
+        this.highScore = data;
+        console.log(this.highScore);
+    }
+
     preload() {
         // load images/tile sprites
         this.load.image('rocket', './assets/rocket.png');
@@ -10,7 +15,7 @@ class Play extends Phaser.Scene {
         this.load.image('starfield', './assets/starfield.png');
 
         //load spritesheet
-        this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9})
+        this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 32, frameHeight: 32, startFrame: 0, endFrame: 4})
     }
 
     create() {
@@ -35,20 +40,38 @@ class Play extends Phaser.Scene {
         //add rocket(p1)
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket');
 
-        //add spaceships(x3)
-        this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0);
-        this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0, 0);
-        this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0, 0);
+        //randomize direction for spaceships, 0 = right, 1 = left
+        let ranDir1 = Math.floor(Math.random() * 2);
+        let ranDir2 = Math.floor(Math.random() * 2);
+        let ranDir3 = Math.floor(Math.random() * 2);
+
+        //add spaceships(x3) according to the random direction given
+        if(ranDir1 == 0){
+            this.ship01 = new Spaceship(this, 0 - (borderUISize*6 + 64), borderUISize*4, 'spaceship', 0, 30, 0).setOrigin(0,0);
+        } else {
+            this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30, 1).setOrigin(0, 0);
+        }
+        if(ranDir2 == 0){
+            this.ship02 = new Spaceship(this, 0 - (borderUISize*3 + 64), borderUISize*5 + borderPadding*2, 'spaceship', 0, 20, 0).setOrigin(0,0);
+        } else {
+            this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20, 1).setOrigin(0, 0);
+        }
+        if(ranDir3 == 0){
+            this.ship03 = new Spaceship(this, 0 - 64, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10, 0).setOrigin(0,0);
+        } else {
+            this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10, 1).setOrigin(0, 0);
+        }
 
         //animation config
         this.anims.create({
             key: 'explode',
-            frames: this.anims.generateFrameNumbers('explosion', {start: 0, end: 9, first: 0}),
-            frameRate: 30
+            frames: this.anims.generateFrameNumbers('explosion', {start: 0, end: 4, first: 0}),
+            frameRate: 15
         });
 
         //initialize score
         this.p1Score = 0;
+
         // display score
         let scoreConfig = {
         fontFamily: 'Courier',
@@ -64,14 +87,18 @@ class Play extends Phaser.Scene {
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
 
+        //display FIRE text
+        this.firingText = this.add.text(game.config.width/2, borderUISize + borderPadding*2, "FIRE!", scoreConfig);
+
         //GAME OVER flag
         this.gameOver = false;
 
-        //60-second play clock
+        //end screen flag
+        this.endScreen = false;
+
+        //after time is done gameOver = true, to signify game is over
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
 
@@ -84,15 +111,50 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+
+        //when game is over run this once
+        if(this.gameOver && !this.endScreen){
+
+            //hide score, FIRE, rocket, and spaceships
+            this.p1Rocket.alpha = 0;
+            this.ship01.alpha = 0;
+            this.ship02.alpha = 0;
+            this.ship03.alpha = 0;
+
+            //shows GAME OVER and options text
+            this.add.text(game.config.width/2, game.config.height/2 - 64, 'GAME OVER', this.scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 32, 'YOUR SCORE', this.scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, this.p1Score, this.scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 96, 'Press (R) to Restart or <- for Menu', this.scoreConfig).setOrigin(0.5);
+
+            //updates highscore if necessary
+            if(this.p1Score > this.highScore.easy){
+                this.highScore.easy = this.p1Score;
+            }
+            //displays current highscore in current session
+            this.add.text(game.config.width/2, game.config.height/2 - 32, 'HIGH SCORE', this.scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2, this.highScore.easy, this.scoreConfig).setOrigin(0.5);
+            console.log(this.highScore.easy);
+
+            this.endScreen = true;
+        }
+
         //check key input for restart
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
-            this.scene.restart();
+            this.scene.restart(this.highScore);
         }
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
-            this.scene.start("menuScene");
+            this.scene.start("menuScene", this.highScore);
         }
         //scrolling star tile sprite
-        this.starfield.tilePositionX -= 4;
+        this.starfield.tilePositionX -= 2;
+
+        //FIRE text on UI when ship is not firing
+        if(this.p1Rocket.checkFiring() || this.gameOver){
+            this.firingText.alpha = 0;
+        } else {
+            this.firingText.alpha = 1;
+        }
 
         //game will keep rockets and ship updated until game goes past 60 seconds
         if(!this.gameOver){
@@ -107,15 +169,15 @@ class Play extends Phaser.Scene {
         //checks collisions
         if(this.checkCollision(this.p1Rocket, this.ship03)) {
             this.p1Rocket.reset();
-            this.shipeExplode(this.ship03)
+            this.shipExplode(this.ship03)
         }
         if(this.checkCollision(this.p1Rocket, this.ship02)) {
             this.p1Rocket.reset();
-            this.shipeExplode(this.ship02)
+            this.shipExplode(this.ship02)
         }
         if(this.checkCollision(this.p1Rocket, this.ship01)) {
             this.p1Rocket.reset();
-            this.shipeExplode(this.ship01)
+            this.shipExplode(this.ship01)
         }
     }
 
@@ -128,7 +190,7 @@ class Play extends Phaser.Scene {
         }
     }
 
-    shipeExplode(ship) {
+    shipExplode(ship) {
         //temporarily hide ship
         ship.alpha = 0;
         //create explotion sprite at ship's position
@@ -146,6 +208,23 @@ class Play extends Phaser.Scene {
         });
         this.p1Score += ship.points;
         this.scoreLeft.text = this.p1Score;
-        this.sound.play('sfx_explosion');
+
+        //play random explosion sound
+        let randomExpSound = Math.floor(Math.random() * 4);
+        switch(randomExpSound){
+            case 0:
+                this.sound.play('sfx_explosion1');
+                break;
+            case 1:
+                this.sound.play('sfx_explosion2');
+                break;
+            case 2:
+                this.sound.play('sfx_explosion3');
+                break;
+            case 3:
+                this.sound.play('sfx_explosion4');
+                break;
+        }
+
     }
 }
