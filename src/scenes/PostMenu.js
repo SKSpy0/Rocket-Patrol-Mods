@@ -1,26 +1,13 @@
-class Menu extends Phaser.Scene {
-    constructor() {
-        super("menuScene");
+class PostMenu extends Phaser.Scene{
+    constructor(){
+        super('postMenu');
     }
 
-    preload() {
-        //load audio
-        this.load.audio('sfx_select', './assets/menuselect.wav');
-        this.load.audio('sfx_explosion1', './assets/explosion1.wav');
-        this.load.audio('sfx_explosion2', './assets/explosion2.wav');
-        this.load.audio('sfx_explosion3', './assets/explosion3.wav');
-        this.load.audio('sfx_explosion4', './assets/explosion4.wav');
-        this.load.audio('sfx_rocket', './assets/rocketshot.wav');
+    init(data){
+        this.highScore = data;
     }
 
-    create() {
-
-        //high score
-        let highScore = {
-            easy: 0,
-            hard: 0
-        }
-
+    create(){
         //menu text config
         let menuConfig = {
             fontFamily: 'Courier',
@@ -54,7 +41,7 @@ class Menu extends Phaser.Scene {
                 difficulty: 0
             }
             this.sound.play('sfx_select');
-            this.scene.start('playScene', highScore); 
+            this.scene.start('playScene', this.highScore); 
         });
 
         keyRIGHT.on('down', () => {
@@ -65,7 +52,8 @@ class Menu extends Phaser.Scene {
                 difficulty: 1  
             }
             this.sound.play('sfx_select');
-            this.scene.start('playScene', highScore); 
+            this.scene.start('playScene', this.highScore); 
         });
     }
+
 }

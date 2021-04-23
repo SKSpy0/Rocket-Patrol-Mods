@@ -111,11 +111,11 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-
         //when game is over run this once
         if(this.gameOver && !this.endScreen){
 
             //hide score, FIRE, rocket, and spaceships
+            this.scoreLeft.alpha = 0;
             this.p1Rocket.alpha = 0;
             this.ship01.alpha = 0;
             this.ship02.alpha = 0;
@@ -127,14 +127,26 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width/2, game.config.height/2 + 64, this.p1Score, this.scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 96, 'Press (R) to Restart or <- for Menu', this.scoreConfig).setOrigin(0.5);
 
-            //updates highscore if necessary
-            if(this.p1Score > this.highScore.easy){
-                this.highScore.easy = this.p1Score;
+            if(game.settings.difficulty == 0){
+                //updates highscore if necessary
+                if(this.p1Score > this.highScore.easy){
+                    this.highScore.easy = this.p1Score;
+                }
+                //displays current highscore in current session
+                this.add.text(game.config.width/2, game.config.height/2 - 32, 'HIGH SCORE', this.scoreConfig).setOrigin(0.5);
+                this.add.text(game.config.width/2, game.config.height/2, this.highScore.easy, this.scoreConfig).setOrigin(0.5);
+            } else {
+                //updates highscore if necessary
+                if(this.p1Score > this.highScore.hard){
+                    this.highScore.hard = this.p1Score;
+                }
+                //displays current highscore in current session
+                this.add.text(game.config.width/2, game.config.height/2 - 32, 'HIGH SCORE', this.scoreConfig).setOrigin(0.5);
+                this.add.text(game.config.width/2, game.config.height/2, this.highScore.hard, this.scoreConfig).setOrigin(0.5);
             }
-            //displays current highscore in current session
-            this.add.text(game.config.width/2, game.config.height/2 - 32, 'HIGH SCORE', this.scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2, this.highScore.easy, this.scoreConfig).setOrigin(0.5);
+
             console.log(this.highScore.easy);
+            console.log(this.highScore.hard);
 
             this.endScreen = true;
         }
@@ -144,7 +156,7 @@ class Play extends Phaser.Scene {
             this.scene.restart(this.highScore);
         }
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
-            this.scene.start("menuScene", this.highScore);
+            this.scene.start("postMenu", this.highScore);
         }
         //scrolling star tile sprite
         this.starfield.tilePositionX -= 2;
