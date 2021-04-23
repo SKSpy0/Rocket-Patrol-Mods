@@ -74,6 +74,13 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+
+        //30-second spaceship speed increase
+        this.clock = this.time.delayedCall(30000, () => {
+            this.ship01.faster();
+            this.ship02.faster();
+            this.ship03.faster();
+        }, null, this);
     }
 
     update() {
