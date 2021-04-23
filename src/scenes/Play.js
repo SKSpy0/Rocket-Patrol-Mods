@@ -72,6 +72,9 @@ class Play extends Phaser.Scene {
         //initialize score
         this.p1Score = 0;
 
+        //initialize time
+        this.timeLeft = game.settings.gameTimer * 0.001;
+
         // display score
         let scoreConfig = {
         fontFamily: 'Courier',
@@ -88,7 +91,12 @@ class Play extends Phaser.Scene {
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
 
         //display FIRE text
-        this.firingText = this.add.text(game.config.width/2, borderUISize + borderPadding*2, "FIRE!", scoreConfig);
+        scoreConfig.align = 'center';
+        this.firingText = this.add.text((game.config.width/2) - 64, borderUISize + borderPadding*2, "FIRE!", scoreConfig);
+
+        //display time remaining
+        scoreConfig.align = 'left';
+        this.timeText = this.add.text(game.config.width - 144, borderUISize + borderPadding*2, this.timeLeft, scoreConfig);
 
         //GAME OVER flag
         this.gameOver = false;
@@ -96,11 +104,8 @@ class Play extends Phaser.Scene {
         //end screen flag
         this.endScreen = false;
 
-        //after time is done gameOver = true, to signify game is over
+        scoreConfig.align = 'right';
         scoreConfig.fixedWidth = 0;
-        this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.gameOver = true;
-        }, null, this);
 
         //30-second spaceship speed increase
         this.clock = this.time.delayedCall(30000, () => {
@@ -176,20 +181,32 @@ class Play extends Phaser.Scene {
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
+            //updates clock
+            var timeLeft = (game.settings.gameTimer * 0.001) - (this.time.now * 0.001);
+            this.timeText.setText(Math.round(timeLeft));
+        }
+
+        //will end game once timer reaches 0
+        if(timeLeft <= 0){ 
+            console.log("time over");
+            this.gameOver = true;
         }
 
         //checks collisions
         if(this.checkCollision(this.p1Rocket, this.ship03)) {
             this.p1Rocket.reset();
-            this.shipExplode(this.ship03)
+            this.shipExplode(this.ship03);
+            game.settings.gameTimer += 1000;
         }
         if(this.checkCollision(this.p1Rocket, this.ship02)) {
             this.p1Rocket.reset();
-            this.shipExplode(this.ship02)
+            this.shipExplode(this.ship02);
+            game.settings.gameTimer += 2000;
         }
         if(this.checkCollision(this.p1Rocket, this.ship01)) {
             this.p1Rocket.reset();
-            this.shipExplode(this.ship01)
+            this.shipExplode(this.ship01);
+            game.settings.gameTimer += 5000;
         }
     }
 
