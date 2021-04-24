@@ -121,6 +121,7 @@ class Play extends Phaser.Scene {
 
             //hide score, time, FIRE, rocket, and spaceships
             this.scoreLeft.alpha = 0;
+            this.timeLeft.alpha = 0;
             this.p1Rocket.alpha = 0;
             this.ship01.alpha = 0;
             this.ship02.alpha = 0;
