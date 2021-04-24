@@ -175,23 +175,17 @@ class Play extends Phaser.Scene {
         if(this.checkCollision(this.p1Rocket, this.ship03)) {
             this.p1Rocket.reset();
             this.shipExplode(this.ship03);
-            game.settings.gameTimer += 1000;
+            game.settings.gameTimer += 500;
         }
         if(this.checkCollision(this.p1Rocket, this.ship02)) {
             this.p1Rocket.reset();
             this.shipExplode(this.ship02);
-            game.settings.gameTimer += 2000;
+            game.settings.gameTimer += 1000;
         }
         if(this.checkCollision(this.p1Rocket, this.ship01)) {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
-            game.settings.gameTimer += 5000;
-        }
-
-        //if you miss a spaceship you lose time
-        if(this.p1Rocket.missed){
-            game.settings.gameTimer -= 3000;
-            this.p1Rocket.missed = false;
+            game.settings.gameTimer += 2000;
         }
 
         //game will keep rockets and ship updated until game goes past 60 seconds

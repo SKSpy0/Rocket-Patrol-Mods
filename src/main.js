@@ -19,7 +19,6 @@ let keyF, keyR, keyLEFT, keyRIGHT;
 
 //List of Mods
 //(5) Created a new menu select and rocket fire SFX
-//(5) If player misses a spaceship, you lose time (3 seconds)
 //(5) Player can move after Rocket is fired
 //(5) Speed Increase after 30 seconds
 //(5) Implemented FIRE UI text but only when player hasn't fired, like how old arcade games would let the player know when they can do an action again
