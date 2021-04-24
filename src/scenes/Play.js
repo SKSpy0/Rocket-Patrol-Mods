@@ -187,6 +187,12 @@ class Play extends Phaser.Scene {
             game.settings.gameTimer += 5000;
         }
 
+        //if you miss a spaceship you lose time
+        if(this.p1Rocket.missed){
+            game.settings.gameTimer -= 3000;
+            this.p1Rocket.missed = false;
+        }
+
         //game will keep rockets and ship updated until game goes past 60 seconds
         if(!this.gameOver){
             //initializes update rocket code
